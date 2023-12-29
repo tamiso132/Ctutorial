@@ -23,9 +23,9 @@ int main(int argc, char const *argv[])
     list_push(list, &a);
     list_push(list, &c);
 
-    list_pop(list);
+    int peek = *((int *)list_pop_peek(list));
+    printf("peek value: %d\n", peek);
 
     print_int_list(list);
-
     return 0;
 }

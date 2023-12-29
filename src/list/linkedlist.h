@@ -1,4 +1,7 @@
 #pragma once
+
+#include "../config/config.h"
+
 typedef struct Node Node;
 typedef struct LinkedList LinkedList;
 
@@ -24,3 +27,5 @@ void *list_pop_peek(const LinkedList *list);
 void *list_pop_front(LinkedList *list);
 void *list_pop_front_peek(const LinkedList *list);
 void list_delete_all(LinkedList *list);
+
+void list_test();
