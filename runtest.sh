@@ -4,5 +4,5 @@ cd build
 cmake ..
 cmake --build .
 cd bin
-./MyProjectC
+./test_executable
 cd ../../
