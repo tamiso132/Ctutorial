@@ -1,1 +1,0 @@
-/usr/bin/cc CMakeFiles/myexecutable.dir/src/hello/hello.c.o CMakeFiles/myexecutable.dir/src/main.c.o -o MyProjectC 
