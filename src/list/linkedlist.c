@@ -6,25 +6,25 @@
 
 #include "linkedlist.h"
 
-LinkedList *list_init()
+#define TRUE 1
+#define FALSE 0
+
+void list_init(LinkedList **listt)
 {
-    LinkedList *list = malloc(sizeof(LinkedList));
-    list->head = NULL;
-    list->tail = NULL;
-    return list;
+    (*listt) = calloc(1, sizeof(LinkedList));
 }
 
-void list_delete_all(LinkedList *list)
+void list_delete_all(LinkedList **listt)
 {
+    LinkedList *list = *listt;
     while (list->tail != NULL)
     {
-        Node *node_to_delete = list->tail;
-        list->tail = list->tail->prev;
+        Node *node_to_delete = (list)->tail;
+        (list)->tail = (list)->tail->prev;
         free(node_to_delete);
     }
-    free(list);
-    printf("\nhello");
-    list = NULL;
+    free(*listt);
+    *listt = NULL;
 }
 
 void list_push(LinkedList *list, void *data)
@@ -34,11 +34,13 @@ void list_push(LinkedList *list, void *data)
 
     if (list->head == NULL)
     {
+        printf("should come here\n");
         list->head = node;
         list->tail = node;
     }
     else
     {
+        printf("oopsie\n");
         node->next = NULL;
         node->prev = list->tail;
 
@@ -65,7 +67,6 @@ void *list_pop(LinkedList *list)
             list->head = NULL;
             list->tail = NULL;
         }
-
         free(pop_node);
         return data;
     }
@@ -82,7 +83,7 @@ void *list_pop_peek(const LinkedList *list)
 }
 void *list_pop_front(LinkedList *list)
 {
-    if (list->tail != NULL)
+    if (list->head != NULL)
     {
         Node *pop_front_node = list->head;
         void *data = pop_front_node->data;
@@ -95,6 +96,7 @@ void *list_pop_front(LinkedList *list)
         }
         return data;
     }
+    return NULL;
 }
 
 void *list_pop_front_peek(const LinkedList *list)
@@ -109,51 +111,49 @@ void *list_pop_front_peek(const LinkedList *list)
     }
 }
 
-void list_test()
+/**
+ * @brief Inserts behind the node behind the indexed node
+ * @return return 1 for success.
+ */
+int list_insert(LinkedList *list, int index, void *data)
 {
-    printf("list test start\n");
-    // Create a new linked list
-    LinkedList *list = list_init();
+    int current_index = 0;
+    Node *current = list->head;
+    while (current != NULL)
+    {
+        if (index == current_index)
+        {
+            // setup for new node
+            Node *insert = malloc(sizeof(Node));
+            insert->data = data;
+            insert->next = current;
+            insert->prev = current->prev;
 
-    // Test list_push
-    int data1 = 42;
-    list_push(list, &data1);
-    assert(list->head != NULL);
-    assert(list->tail != NULL);
-    assert(list->head->data == &data1);
-    assert(list->tail->data == &data1);
+            // put new node behind current
+            current->prev = insert;
 
-    printf("list test start\n");
+            if (current_index > 0) // if there is a behind orginally
+            {
+                // put node behind currents next to the new behind.
+                current->prev->next = insert;
+            }
+            else
+            {
+                list->head = insert;
+            }
+            return TRUE;
+        }
+    }
+    if (current_index == 0) // no values in and insert at 0
+    {
+        Node *first_value = malloc(sizeof(Node));
+        first_value->data = data;
+        first_value->next = NULL;
+        first_value->prev = NULL;
 
-    // Test list_pop
-    void *pop_data = list_pop(list);
-    assert(pop_data == &data1);
-    assert(list->head == NULL);
-    assert(list->tail == NULL);
-
-    printf("list test start\n");
-    // Test list_push again
-    int data2 = 55;
-    list_push(list, &data2);
-    assert(list->head != NULL);
-    assert(list->tail != NULL);
-    assert(list->head->data == &data2);
-    assert(list->tail->data == &data2);
-
-    printf("list test start\n");
-
-    // Test list_pop_front
-    void *pop_front_data = list_pop_front(list);
-    assert(pop_front_data == &data2);
-    assert(list->head == NULL);
-    assert(list->tail == NULL);
-
-    printf("list test start\n");
-    // Test other functions as needed
-
-    // Clean up
-    list_delete_all(list);
-
-    assert(list == NULL);
-    printf("list test done\n");
+        list->head = first_value;
+        list->tail = first_value;
+        return TRUE;
+    }
+    return FALSE;
 }

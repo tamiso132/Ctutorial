@@ -1,3 +1,8 @@
 {
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "files.associations": {
+        "array": "c",
+        "string": "c",
+        "linkedlist.h": "c"
+    }
 }

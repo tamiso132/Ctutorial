@@ -10,21 +10,21 @@ print_int_list(LinkedList *list)
     while (current != NULL)
     {
         int deref = *((int *)current->data);
-        printf("Hello: %d\n", deref);
         current = current->next;
     }
 }
 
 int main(int argc, char const *argv[])
 {
-    LinkedList *list = list_init();
+    LinkedList **listt;
+    list_init(listt);
+    LinkedList *list = listt;
     int b = 10, a = 20, c = 100;
     list_push(list, &b);
     list_push(list, &a);
     list_push(list, &c);
 
     int peek = *((int *)list_pop_peek(list));
-    printf("peek value: %d\n", peek);
 
     print_int_list(list);
     return 0;
