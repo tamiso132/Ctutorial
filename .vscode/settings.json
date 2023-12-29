@@ -3,6 +3,9 @@
     "files.associations": {
         "array": "c",
         "string": "c",
-        "linkedlist.h": "c"
+        "linkedlist.h": "c",
+        "stddef.h": "c",
+        "vector": "c",
+        "vector.h": "c"
     }
 }

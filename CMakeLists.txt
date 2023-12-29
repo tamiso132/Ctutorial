@@ -1,3 +1,4 @@
+add_definitions(-DNDEBUG) # add compiler flag to every executable
 # Set the minimum required CMake version
 cmake_minimum_required(VERSION 3.5)
 
@@ -28,6 +29,7 @@ set_target_properties(myexecutable PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_
 
 # Add the test executable target
 add_executable(test_executable ${SOURCES} ${HEADERS} src/main_test.c)
+
 # Set TEST_MODE to 1 for the test executable
 target_compile_definitions(test_executable PRIVATE TEST_MODE)
 

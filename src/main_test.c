@@ -3,8 +3,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "hello/hello.h"
-#include "list/linkedlist.h"
+#include "collection/linkedlist.h"
+#include "collection/vector.h"
 
 void list_test()
 {
@@ -78,8 +78,49 @@ void list_test()
     printf("list test end\n");
 }
 
+void vector_test()
+{
+    printf("\n\n");
+    Vector vector;
+    init_vector(&vector, sizeof(int), 1);
+    int d1 = 42;
+    int d2 = 72;
+    int d3 = 100;
+    vector_push_element(&vector, &d1);
+    vector_push_element(&vector, &d2);
+    vector_push_element(&vector, &d3);
+
+    int number = *((char *)vector_get(&vector, 0));
+    assert(number == d1);
+
+    number = *((char *)vector_get(&vector, 1));
+    assert(number == d2);
+
+    number = *((char *)vector_get(&vector, 2));
+    assert(number == d3);
+
+    vector_remove(&vector, 0);
+    vector_remove(&vector, 0);
+    vector_remove(&vector, 0);
+
+    assert(vector.length == 0);
+
+    vector_push_element(&vector, &d1);
+    vector_push_element(&vector, &d2);
+    vector_push_element(&vector, &d3);
+
+    vector_remove(&vector, 1);
+    number = *((char *)vector_get(&vector, 0));
+    assert(number == d1);
+
+    number = *((char *)vector_get(&vector, 1));
+    assert(number == d3);
+
+    printf("Finished\n");
+}
 int main(int argc, char const *argv[])
 {
     list_test();
+    vector_test();
     return 0;
 }
