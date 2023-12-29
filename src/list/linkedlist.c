@@ -19,9 +19,7 @@ void list_delete_all(LinkedList **listt)
     LinkedList *list = *listt;
     while (list->tail != NULL)
     {
-        Node *node_to_delete = (list)->tail;
-        (list)->tail = (list)->tail->prev;
-        free(node_to_delete);
+        free(list_pop(list));
     }
     free(*listt);
     *listt = NULL;
@@ -34,13 +32,11 @@ void list_push(LinkedList *list, void *data)
 
     if (list->head == NULL)
     {
-        printf("should come here\n");
         list->head = node;
         list->tail = node;
     }
     else
     {
-        printf("oopsie\n");
         node->next = NULL;
         node->prev = list->tail;
 
@@ -52,7 +48,6 @@ void list_push(LinkedList *list, void *data)
 void *list_pop(LinkedList *list)
 {
 
-    printf("wtf");
     if (list->tail != NULL)
     {
         Node *pop_node = list->tail;
@@ -70,7 +65,6 @@ void *list_pop(LinkedList *list)
         free(pop_node);
         return data;
     }
-    printf("wtf");
     return NULL;
 }
 void *list_pop_peek(const LinkedList *list)
