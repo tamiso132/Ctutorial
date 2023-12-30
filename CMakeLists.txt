@@ -1,4 +1,3 @@
-add_definitions(-DNDEBUG) # add compiler flag to every executable
 # Set the minimum required CMake version
 cmake_minimum_required(VERSION 3.5)
 
@@ -35,3 +34,5 @@ target_compile_definitions(test_executable PRIVATE TEST_MODE)
 
 set_target_properties(test_executable PROPERTIES OUTPUT_NAME test_executable)
 set_target_properties(test_executable PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+# Enable assert in test_executable

@@ -17,10 +17,11 @@ void init_vector(Vector *vector, const int element_size, int capacity)
     vector->capacity = capacity;
     vector->length = 0;
     vector->element_size = element_size;
+
+    assert(vector->element_size > 0);
 }
 void vector_push_element(Vector *vector, void *element)
 {
-    assert(sizeof(*element) == vector->element_size);
     assert(element != NULL);
 
     if (vector->capacity <= vector->element_size) // extend capacity
@@ -61,7 +62,7 @@ void vector_remove(Vector *vector, int index)
         int index_bytes = vector->element_size * index;
         int bytes_to_move = diff_elements * vector->element_size;
 
-        memmove((void *)vector->data + index_bytes, (void *)vector->data + index_next_bytes, bytes_to_move);
+        memmove((void *)(vector->data + index_bytes), (void *)(vector->data + index_next_bytes), bytes_to_move);
     }
 
     vector->length--;

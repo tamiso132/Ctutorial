@@ -1,0 +1,16 @@
+#pragma once
+// Include necessary headers
+#include <stddef.h> // for size_t
+#include <stdlib.h> // for malloc, free
+#include <string.h> // for strdup, strlen
+
+// Forward declarations
+typedef struct HashTable HashTable;
+
+// public method
+void hashmap_insert(HashTable *table, const char *key, void *value);
+int hashmap_remove(HashTable *table, const char *key);
+void *hashmap_get(const HashTable *table, const char *key);
+
+void hashmap_init(HashTable **table, size_t size, size_t element_size);
+void hashmap_destroy(HashTable *table);

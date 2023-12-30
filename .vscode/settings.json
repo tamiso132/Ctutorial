@@ -6,6 +6,20 @@
         "linkedlist.h": "c",
         "stddef.h": "c",
         "vector": "c",
-        "vector.h": "c"
+        "vector.h": "c",
+        "internalhash.h": "c",
+        "*.tcc": "c",
+        "hashmap.h": "c",
+        "charconv": "c",
+        "chrono": "c",
+        "optional": "c",
+        "format": "c",
+        "ratio": "c",
+        "system_error": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "assert.h": "c"
     }
 }

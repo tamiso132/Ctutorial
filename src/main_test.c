@@ -1,10 +1,85 @@
+
 #include <stddef.h>
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "collection/linkedlist.h"
 #include "collection/vector.h"
+#include "hashmap/hashmap.h"
+
+#define NDEBUG
+
+void benchmark_operations(size_t num_operations, size_t hashmap_size)
+{
+    HashTable *table;
+    size_t i;
+
+    // Initialize the hash table
+    hashmap_init(&table, hashmap_size, sizeof(int));
+
+    // Benchmark insertions
+    clock_t start_time = clock();
+    for (i = 0; i < num_operations; ++i)
+    {
+        char *key = malloc(20);
+        assert(key != NULL);
+        snprintf(key, 20, "key%d", (int)i);
+        int value = i;
+        hashmap_insert(table, key, &value);
+    }
+    clock_t end_time = clock();
+    printf("Insertions took %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
+
+    // Benchmark retrievals
+    // start_time = clock();
+    // for (i = 0; i < num_operations; ++i)
+    // {
+    //     char key[20];
+    //     sprintf(key, "key%d", (int)i);
+    //     hashmap_get(table, key);
+    // }
+    // end_time = clock();
+    // printf("Retrievals took %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
+
+    // // Benchmark removals
+    // start_time = clock();
+    // for (i = 0; i < num_operations; ++i)
+    // {
+    //     char key[20];
+    //     sprintf(key, "key%d", (int)i);
+    //     hashmap_remove(table, key);
+    // }
+    // end_time = clock();
+    // printf("Removals took %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
+
+    // // Destroy the hash table
+    hashmap_destroy(table);
+}
+
+void hashmap_test()
+{
+    HashTable *hashmap;
+    hashmap_init(&hashmap, 100, sizeof(int));
+    assert(hashmap != NULL);
+
+    int value_1 = 50;
+    int value_2 = 70;
+
+    hashmap_insert(hashmap, "example_key", &value_1);
+    hashmap_insert(hashmap, "hello", &value_2);
+
+    int *val_2 = (int *)hashmap_get(hashmap, "hello");
+    int *val_1 = (int *)hashmap_get(hashmap, "example_key");
+
+    assert(*val_1 == value_1);
+    assert(*val_2 == value_2);
+
+    assert(hashmap_remove(hashmap, "hello") == 1);
+    assert(hashmap_remove(hashmap, "hello") == -1);
+    assert(hashmap_remove(hashmap, "helloggggg") == -1);
+}
 
 void list_test()
 {
@@ -66,9 +141,9 @@ void list_test()
     list_insert(list, 0, &data2);
     list_insert(list, 0, &data3);
 
-    void *value = list_pop_front(list);
-    value = list_pop_front(list);
-    value = list_pop_front(list);
+    list_pop_front(list);
+    list_pop_front(list);
+    list_pop_front(list);
 
     printf("List Insert Done\n");
 
@@ -118,9 +193,14 @@ void vector_test()
 
     printf("Finished\n");
 }
+
+#pragma GCC diagnostic ignored "-Wunused-parameter" // for disable main parameter warning
 int main(int argc, char const *argv[])
 {
-    list_test();
-    vector_test();
+    // list_test();
+    // vector_test();
+    hashmap_test();
+    benchmark_operations(200, 1000000);
     return 0;
 }
+#pragma GCC diagnostic warning "-Wunused-parameter"
