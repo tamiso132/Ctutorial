@@ -7,7 +7,7 @@
 typedef struct KeyValuePair
 {
     char *key;
-    void *value;
+    int value;
 } KeyValuePair;
 
 typedef struct Node
@@ -18,7 +18,7 @@ typedef struct Node
 
 uint32_t xxHash32(const void *input, size_t length, uint32_t seed);
 
-KeyValuePair *create_pair(const char *key, void *value, int element_size);
+KeyValuePair *create_pair(const char *key, int value, int element_size);
 Node *create_node(KeyValuePair *pair);
 void destroy_node(Node *node);
 

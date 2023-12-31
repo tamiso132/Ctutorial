@@ -10,44 +10,58 @@
 struct HashTable
 {
     size_t element_size;
-    size_t size;
+    uint32_t max_size;
+    uint32_t current_size;
     Node **array;
 };
 
+static const float EXTEND_LOAD_FACTOR = 0.7;
+
+#define GET_FAILED INT32_MAX - 1
+
+// private function
+void hashmap_resize(HashTable **tablee, size_t new_size);
+
 // Function to insert a key-value pair into the hash table
-void hashmap_insert(HashTable *table, const char *key, void *value)
+void hashmap_insert(HashTable **table, const char *key, int value)
 {
     assert(key != NULL);
-    printf("String: %s\n", key);
-    int index = xxHash32(key, strlen(key), 0) % table->size;
+    int n_index = xxHash32(key, strlen(key), 0);
 
-    KeyValuePair *pair = create_pair(key, value, table->element_size);
+    int index = n_index % ((*table)->max_size - 1);
+
+    KeyValuePair *pair = create_pair(key, value, (*table)->element_size);
 
     Node *new_node = create_node(pair);
     assert(new_node != NULL); // Check if create_node was successful
 
-    assert(table != NULL);
-    assert(table->array != NULL);
-    assert(table->size > 0);
+    assert((*table) != NULL);
+    assert((*table)->array != NULL);
+    assert((*table)->max_size > 0);
 
-    if (table->array[index] == NULL)
+    if ((*table)->array[index] == NULL)
     {
-        table->array[index] = new_node;
-        table->array[index]->next = NULL;
+        (*table)->array[index] = new_node;
+        (*table)->array[index]->next = NULL;
     }
     else
     {
-        printf("collision now\n");
-        new_node->next = table->array[index];
-        table->array[index] = new_node;
+        new_node->next = (*table)->array[index];
+        (*table)->array[index] = new_node;
     }
+    (*table)->current_size++;
 
-    // assert(hashmap_get(table, key) != NULL); // Check if insertion was successful
+    if ((*table)->current_size > (*table)->max_size * EXTEND_LOAD_FACTOR)
+    {
+        uint32_t new_capacity = (*table)->max_size * 2;
+        hashmap_resize(table, new_capacity);
+    }
+    assert(hashmap_get(*table, key) != GET_FAILED); // Check if insertion was successful
 }
 
-int hashmap_remove(HashTable *table, const char *key)
+int hashmap_remove(HashTable *table, const char *key) // dont shrink during remove, do it during get
 {
-    size_t hash_index = xxHash32(key, table->size, 0) % table->size;
+    size_t hash_index = xxHash32(key, strlen(key), 0) % (table->max_size - 1);
 
     if (table->array[hash_index] != NULL)
     {
@@ -77,6 +91,7 @@ int hashmap_remove(HashTable *table, const char *key)
             {
                 prev->next = node->next;
                 destroy_node(node);
+                table->current_size--;
                 return 1;
             }
             prev = node;
@@ -87,10 +102,10 @@ int hashmap_remove(HashTable *table, const char *key)
 }
 
 // return -1 if not found
-void *hashmap_get(const HashTable *table, const char *key)
+int hashmap_get(const HashTable *table, const char *key)
 {
     assert(key != NULL);
-    size_t index = xxHash32(key, table->size, 0) % table->size;
+    size_t index = xxHash32(key, strlen(key), 0) % (table->max_size - 1);
 
     // Traverse the linked list to find the key
     Node *current = table->array[index];
@@ -104,15 +119,16 @@ void *hashmap_get(const HashTable *table, const char *key)
     }
 
     // Key not found
-    return (void *)-1;
+    return GET_FAILED;
 }
 
 // Function to create a new hash table
-void hashmap_init(HashTable **tablee, size_t size, size_t element_size)
+void hashmap_init(HashTable **tablee, size_t max_size, size_t element_size)
 {
     *tablee = malloc(sizeof(HashTable));
-    (*tablee)->size = size;
-    (*tablee)->array = (Node **)calloc(size, sizeof(Node *));
+    (*tablee)->max_size = max_size;
+    (*tablee)->current_size = 0;
+    (*tablee)->array = (Node **)calloc(max_size, sizeof(Node *));
     (*tablee)->element_size = element_size;
 
     assert(*tablee != NULL);
@@ -122,7 +138,7 @@ void hashmap_init(HashTable **tablee, size_t size, size_t element_size)
 // Function to free the memory used by the hash table
 void hashmap_destroy(HashTable *table)
 {
-    for (size_t i = 0; i < table->size; ++i)
+    for (size_t i = 0; i < table->max_size; ++i)
     {
         Node *current = table->array[i];
         while (current != NULL)
@@ -138,4 +154,41 @@ void hashmap_destroy(HashTable *table)
     assert(table != NULL);
     free(table->array);
     free(table);
+}
+
+void hashmap_resize(HashTable **tablee, size_t new_size)
+{
+    HashTable *table = *tablee;
+    assert(new_size > 0);
+
+    if (table->current_size > new_size) // shrink hashmap
+    {
+    }
+    else // extend map
+    {
+        HashTable *new_table;
+        hashmap_init(&new_table, table->max_size * 2, sizeof(int));
+
+        for (size_t i = 0; i < table->max_size; ++i)
+        {
+            Node *current = table->array[i];
+            while (current != NULL)
+            {
+                // OPTIMIZER CAN BE MADE, HAVE A NODE SAVE THE AMOUNT OF modules it took for it to get index
+                // then when you resize, you can just calculate the new place without doing new hash cause u know calculate the index to %
+
+                // OPTIMIZER , POWER OF TWO MAGIC
+
+                Node *temp = current;
+                current = current->next;
+
+                hashmap_insert(&new_table, temp->pair.key, temp->pair.value);
+                destroy_node(temp);
+            }
+        }
+        free(table->array);
+        free(table);
+
+        *tablee = new_table;
+    }
 }

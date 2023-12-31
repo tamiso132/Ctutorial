@@ -19,7 +19,6 @@ uint32_t XXH_read32(const void *memPtr);
 
 uint32_t xxHash32(const void *input, size_t length, uint32_t seed)
 {
-    printf("once\n");
     assert(input != NULL);
     assert(length > 0);
     const uint8_t *p = (const uint8_t *)input;
@@ -73,23 +72,17 @@ uint32_t xxHash32(const void *input, size_t length, uint32_t seed)
     h32 *= PRIME32_3;
     h32 ^= h32 >> 16;
 
-    printf("h32: %u\n", h32);
-    printf("does it come here twice?\n");
-    fflush(stdout);
     return h32;
 }
 
 // Function to create a new key-value pair
-KeyValuePair *create_pair(const char *key, void *value, int element_size)
+KeyValuePair *create_pair(const char *key, int value, int element_size)
 {
     KeyValuePair *pair = (KeyValuePair *)malloc(sizeof(KeyValuePair));
     pair->key = strdup(key); // strdup allocates memory for the key
-    pair->value = malloc(element_size);
-
-    memcpy(pair->value, value, element_size);
+    pair->value = value;
 
     assert(pair->key != NULL);
-    assert(pair->value != NULL);
     return pair;
 }
 
@@ -107,11 +100,9 @@ Node *create_node(KeyValuePair *pair)
 void destroy_node(Node *node)
 {
     assert(node->pair.key != NULL);
-    assert(node->pair.value != NULL);
     assert(node != NULL);
 
     free(node->pair.key);
-    free(node->pair.value);
     free(node);
 }
 // Helper functions
@@ -139,7 +130,6 @@ uint32_t XXH32_mergeAccs(uint32_t acc1, uint32_t acc2, uint32_t acc3, uint32_t a
 
 uint32_t XXH_read32(const void *memPtr)
 {
-    assert(memPtr != NULL);
     return *(const uint32_t *)memPtr;
 }
 

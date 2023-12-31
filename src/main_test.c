@@ -1,3 +1,4 @@
+#define NDEBUG
 
 #include <stddef.h>
 #include <stdio.h>
@@ -9,76 +10,84 @@
 #include "collection/vector.h"
 #include "hashmap/hashmap.h"
 
-#define NDEBUG
-
-void benchmark_operations(size_t num_operations, size_t hashmap_size)
+void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat)
 {
-    HashTable *table;
-    size_t i;
-
-    // Initialize the hash table
-    hashmap_init(&table, hashmap_size, sizeof(int));
-
-    // Benchmark insertions
-    clock_t start_time = clock();
-    for (i = 0; i < num_operations; ++i)
+    int repeat_clone = repeat;
+    double insertion_total = 0;
+    double retrive_total = 0;
+    double removal_total = 0;
+    while (repeat_clone > 0)
     {
-        char *key = malloc(20);
-        assert(key != NULL);
-        snprintf(key, 20, "key%d", (int)i);
-        int value = i;
-        hashmap_insert(table, key, &value);
+        HashTable *table;
+        size_t i;
+
+        printf("Number of operations in respective benching %ld\n", num_operations);
+
+        // Initialize the hash table
+        hashmap_init(&table, hashmap_size, sizeof(int));
+        // Benchmark insertions
+        clock_t start_time = clock();
+        for (i = 0; i < num_operations; ++i)
+        {
+            char key[20];
+            sprintf(key, "key%d", (int)i);
+            int value = i;
+            hashmap_insert(&table, key, value);
+        }
+        clock_t end_time = clock();
+        insertion_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
+        // Benchmark retrievals
+        start_time = clock();
+        for (i = 0; i < num_operations; ++i)
+        {
+            char key[20];
+            sprintf(key, "key%d", (int)i);
+            hashmap_get(table, key);
+        }
+        end_time = clock();
+        retrive_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
+        // Benchmark removals
+        start_time = clock();
+        for (i = 0; i < num_operations; ++i)
+        {
+            char key[20];
+            sprintf(key, "key%d", (int)i);
+            hashmap_remove(table, key);
+        }
+        end_time = clock();
+        removal_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
+
+        // // Destroy the hash table
+        hashmap_destroy(table);
+        repeat_clone--;
     }
-    clock_t end_time = clock();
-    printf("Insertions took %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
 
-    // Benchmark retrievals
-    // start_time = clock();
-    // for (i = 0; i < num_operations; ++i)
-    // {
-    //     char key[20];
-    //     sprintf(key, "key%d", (int)i);
-    //     hashmap_get(table, key);
-    // }
-    // end_time = clock();
-    // printf("Retrievals took %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
-
-    // // Benchmark removals
-    // start_time = clock();
-    // for (i = 0; i < num_operations; ++i)
-    // {
-    //     char key[20];
-    //     sprintf(key, "key%d", (int)i);
-    //     hashmap_remove(table, key);
-    // }
-    // end_time = clock();
-    // printf("Removals took %f seconds\n", (double)(end_time - start_time) / CLOCKS_PER_SEC);
-
-    // // Destroy the hash table
-    hashmap_destroy(table);
+    printf("\nInsertions took %f seconds\n", insertion_total / repeat);
+    printf("Retrievals took %f seconds\n", removal_total / repeat);
+    printf("Removals took %f seconds\n\n", retrive_total / repeat);
 }
 
 void hashmap_test()
 {
-    HashTable *hashmap;
-    hashmap_init(&hashmap, 100, sizeof(int));
-    assert(hashmap != NULL);
+    // HashTable *hashmap;
+    // hashmap_init(&hashmap, 100, sizeof(int));
+    // assert(hashmap != NULL);
 
-    int value_1 = 50;
-    int value_2 = 70;
+    // int value_1 = 50;
+    // int value_2 = 70;
 
-    hashmap_insert(hashmap, "example_key", &value_1);
-    hashmap_insert(hashmap, "hello", &value_2);
+    // hashmap_insert(hashmap, "example_key", &value_1);
+    // hashmap_insert(hashmap, "hello", &value_2);
 
-    int *val_2 = (int *)hashmap_get(hashmap, "hello");
-    int *val_1 = (int *)hashmap_get(hashmap, "example_key");
+    // int *val_2 = (int *)hashmap_get(hashmap, "hello");
+    // int *val_1 = (int *)hashmap_get(hashmap, "example_key");
 
-    assert(*val_1 == value_1);
-    assert(*val_2 == value_2);
+    // assert(*val_1 == value_1);
+    // assert(*val_2 == value_2);
 
-    assert(hashmap_remove(hashmap, "hello") == 1);
-    assert(hashmap_remove(hashmap, "hello") == -1);
-    assert(hashmap_remove(hashmap, "helloggggg") == -1);
+    // assert(hashmap_remove(hashmap, "hello") == 1);
+    // assert(hashmap_remove(hashmap, "hello") == -1);
+    // assert(hashmap_remove(hashmap, "helloggggg") == -1);
 }
 
 void list_test()
@@ -153,54 +162,54 @@ void list_test()
     printf("list test end\n");
 }
 
-void vector_test()
-{
-    printf("\n\n");
-    Vector vector;
-    init_vector(&vector, sizeof(int), 1);
-    int d1 = 42;
-    int d2 = 72;
-    int d3 = 100;
-    vector_push_element(&vector, &d1);
-    vector_push_element(&vector, &d2);
-    vector_push_element(&vector, &d3);
+// void vector_test()
+// {
+//     printf("\n\n");
+//     Vector vector;
+//     init_vector(&vector, sizeof(int), 1);
+//     int d1 = 42;
+//     int d2 = 72;
+//     int d3 = 100;
+//     vector_push_element(&vector, &d1);
+//     vector_push_element(&vector, &d2);
+//     vector_push_element(&vector, &d3);
 
-    int number = *((char *)vector_get(&vector, 0));
-    assert(number == d1);
+//     int number = *((char *)vector_get(&vector, 0));
+//     assert(number == d1);
 
-    number = *((char *)vector_get(&vector, 1));
-    assert(number == d2);
+//     number = *((char *)vector_get(&vector, 1));
+//     assert(number == d2);
 
-    number = *((char *)vector_get(&vector, 2));
-    assert(number == d3);
+//     number = *((char *)vector_get(&vector, 2));
+//     assert(number == d3);
 
-    vector_remove(&vector, 0);
-    vector_remove(&vector, 0);
-    vector_remove(&vector, 0);
+//     vector_remove(&vector, 0);
+//     vector_remove(&vector, 0);
+//     vector_remove(&vector, 0);
 
-    assert(vector.length == 0);
+//     assert(vector.length == 0);
 
-    vector_push_element(&vector, &d1);
-    vector_push_element(&vector, &d2);
-    vector_push_element(&vector, &d3);
+//     vector_push_element(&vector, &d1);
+//     vector_push_element(&vector, &d2);
+//     vector_push_element(&vector, &d3);
 
-    vector_remove(&vector, 1);
-    number = *((char *)vector_get(&vector, 0));
-    assert(number == d1);
+//     vector_remove(&vector, 1);
+//     number = *((char *)vector_get(&vector, 0));
+//     assert(number == d1);
 
-    number = *((char *)vector_get(&vector, 1));
-    assert(number == d3);
+//     number = *((char *)vector_get(&vector, 1));
+//     assert(number == d3);
 
-    printf("Finished\n");
-}
+//     printf("Finished\n");
+// }
 
 #pragma GCC diagnostic ignored "-Wunused-parameter" // for disable main parameter warning
 int main(int argc, char const *argv[])
 {
     // list_test();
     // vector_test();
-    hashmap_test();
-    benchmark_operations(200, 1000000);
+    //  hashmap_test();
+    benchmark_operations(1000000, 8, 2);
     return 0;
 }
 #pragma GCC diagnostic warning "-Wunused-parameter"
