@@ -1,6 +1,7 @@
 #pragma once
 // Include necessary headers
 #include <stddef.h> // for size_t
+#include <stdint.h>
 #include <stdlib.h> // for malloc, free
 #include <string.h> // for strdup, strlen
 

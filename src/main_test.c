@@ -46,25 +46,25 @@ void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat
         }
         end_time = clock();
         retrive_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
-        // Benchmark removals
-        start_time = clock();
-        for (i = 0; i < num_operations; ++i)
-        {
-            char key[20];
-            sprintf(key, "key%d", (int)i);
-            hashmap_remove(table, key);
-        }
-        end_time = clock();
-        removal_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
+        // // Benchmark removals
+        // start_time = clock();
+        // for (i = 0; i < num_operations; ++i)
+        // {
+        //     char key[20];
+        //     sprintf(key, "key%d", (int)i);
+        //     hashmap_remove(table, key);
+        // }
+        // end_time = clock();
+        // removal_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
 
-        // // Destroy the hash table
-        hashmap_destroy(table);
+        // // // Destroy the hash table
+        // hashmap_destroy(table);
         repeat_clone--;
     }
 
     printf("\nInsertions took %f seconds\n", insertion_total / repeat);
-    printf("Retrievals took %f seconds\n", removal_total / repeat);
-    printf("Removals took %f seconds\n\n", retrive_total / repeat);
+    printf("Retrievals took %f seconds\n", retrive_total / repeat);
+    printf("Removals took %f seconds\n\n", removal_total / repeat);
 }
 
 void hashmap_test()

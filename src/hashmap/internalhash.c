@@ -17,6 +17,11 @@ uint32_t XXH32_round(uint32_t acc, uint32_t input);
 uint32_t XXH32_mergeAccs(uint32_t acc1, uint32_t acc2, uint32_t acc3, uint32_t acc4);
 uint32_t XXH_read32(const void *memPtr);
 
+int calculate_modulus(int value, int powerOfTwo)
+{
+    return value & ((1 << powerOfTwo) - 1);
+}
+
 uint32_t xxHash32(const void *input, size_t length, uint32_t seed)
 {
     assert(input != NULL);
@@ -79,20 +84,22 @@ uint32_t xxHash32(const void *input, size_t length, uint32_t seed)
 KeyValuePair *create_pair(const char *key, int value, int element_size)
 {
     KeyValuePair *pair = (KeyValuePair *)malloc(sizeof(KeyValuePair));
-    pair->key = strdup(key); // strdup allocates memory for the key
+    pair->key = malloc(strlen(key));
     pair->value = value;
 
+    strcpy(pair->key, key);
     assert(pair->key != NULL);
     return pair;
 }
 
 // Function to create a new node
-Node *create_node(KeyValuePair *pair)
+Node *create_node(KeyValuePair *pair, uint32_t module_number)
 {
     assert(pair != NULL);
     Node *node = (Node *)malloc(sizeof(Node));
     node->pair = *pair;
     node->next = NULL;
+    node->hash = module_number;
 
     assert(node != NULL);
     return node;
@@ -137,7 +144,6 @@ int is_equal_key(const Node *one, const char *key)
 {
     assert(&one->pair != NULL);
     assert(&one->pair.key != NULL);
-    assert(&one->pair.value != NULL);
 
     char *key_one = one->pair.key;
 
