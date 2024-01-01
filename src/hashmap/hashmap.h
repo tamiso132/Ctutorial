@@ -13,5 +13,5 @@ void hashmap_insert(HashTable **table, const char *key, int value);
 int hashmap_remove(HashTable *table, const char *key);
 int hashmap_get(const HashTable *table, const char *key);
 
-void hashmap_init(HashTable **table, size_t max_size, size_t element_size);
+void hashmap_init(HashTable **table, uint32_t max_size, size_t element_size);
 void hashmap_destroy(HashTable *table);

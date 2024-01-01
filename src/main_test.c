@@ -12,6 +12,7 @@
 
 void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat)
 {
+
     int repeat_clone = repeat;
     double insertion_total = 0;
     double retrive_total = 0;
@@ -46,19 +47,19 @@ void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat
         }
         end_time = clock();
         retrive_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
-        // // Benchmark removals
-        // start_time = clock();
-        // for (i = 0; i < num_operations; ++i)
-        // {
-        //     char key[20];
-        //     sprintf(key, "key%d", (int)i);
-        //     hashmap_remove(table, key);
-        // }
-        // end_time = clock();
-        // removal_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
+        // Benchmark removals
+        start_time = clock();
+        for (i = 0; i < num_operations; ++i)
+        {
+            char key[20];
+            sprintf(key, "key%d", (int)i);
+            hashmap_remove(table, key);
+        }
+        end_time = clock();
+        removal_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
 
-        // // // Destroy the hash table
-        // hashmap_destroy(table);
+        // // Destroy the hash table
+        hashmap_destroy(table);
         repeat_clone--;
     }
 
@@ -92,74 +93,74 @@ void hashmap_test()
 
 void list_test()
 {
-    printf("list test start\n");
-    // Create a new linked list
-    LinkedList *list;
-    list_init(&list);
+    // printf("list test start\n");
+    // // Create a new linked list
+    // LinkedList *list;
+    // list_init(&list);
 
-    printf("Init Done\n");
+    // printf("Init Done\n");
 
-    if (list == NULL)
-    {
-        printf("yeppers\n");
-    }
-    else
-    {
-        printf("noppers\n");
-    }
+    // if (list == NULL)
+    // {
+    //     printf("yeppers\n");
+    // }
+    // else
+    // {
+    //     printf("noppers\n");
+    // }
 
-    // Test list_push
-    int data1 = 42;
-    list_push(list, &data1);
-    assert((list)->head != NULL);
-    assert((list)->tail != NULL);
-    assert((list)->head->data == &data1);
-    assert((list)->tail->data == &data1);
+    // // Test list_push
+    // int data1 = 42;
+    // list_push(list, &data1);
+    // assert((list)->head != NULL);
+    // assert((list)->tail != NULL);
+    // assert((list)->head->data == &data1);
+    // assert((list)->tail->data == &data1);
 
-    printf("Push Test Done\n");
+    // printf("Push Test Done\n");
 
-    // Test list_pop
-    void *pop_data = list_pop(list);
-    assert(pop_data == &data1);
-    assert((list)->head == NULL);
-    assert((list)->tail == NULL);
+    // // Test list_pop
+    // void *pop_data = list_pop(list);
+    // assert(pop_data == &data1);
+    // assert((list)->head == NULL);
+    // assert((list)->tail == NULL);
 
-    printf("Pop Test Done\n");
+    // printf("Pop Test Done\n");
 
-    // Test list_push again
-    int data2 = 57;
-    list_push(list, &data2);
-    assert((list)->head != NULL);
-    assert((list)->tail != NULL);
-    assert((list)->head->data == &data2);
-    assert((list)->tail->data == &data2);
+    // // Test list_push again
+    // int data2 = 57;
+    // list_push(list, &data2);
+    // assert((list)->head != NULL);
+    // assert((list)->tail != NULL);
+    // assert((list)->head->data == &data2);
+    // assert((list)->tail->data == &data2);
 
-    // Test list_pop_front
-    void *pop_front_data = list_pop_front(list);
-    assert(pop_front_data == &data2);
-    assert((list)->head == NULL);
-    assert((list)->tail == NULL);
+    // // Test list_pop_front
+    // void *pop_front_data = list_pop_front(list);
+    // assert(pop_front_data == &data2);
+    // assert((list)->head == NULL);
+    // assert((list)->tail == NULL);
 
-    printf("Pop Front Test Done\n");
+    // printf("Pop Front Test Done\n");
 
-    // Test other functions as needed
+    // // Test other functions as needed
 
-    // Test insert functions
-    int data3 = 55;
-    list_insert(list, 0, &data1);
-    list_insert(list, 0, &data2);
-    list_insert(list, 0, &data3);
+    // // Test insert functions
+    // int data3 = 55;
+    // list_insert(list, 0, &data1);
+    // list_insert(list, 0, &data2);
+    // list_insert(list, 0, &data3);
 
-    list_pop_front(list);
-    list_pop_front(list);
-    list_pop_front(list);
+    // list_pop_front(list);
+    // list_pop_front(list);
+    // list_pop_front(list);
 
-    printf("List Insert Done\n");
+    // printf("List Insert Done\n");
 
-    // Clean up
-    list_delete_all(&list);
-    assert(list == NULL);
-    printf("list test end\n");
+    // // Clean up
+    // list_delete_all(&list);
+    // assert(list == NULL);
+    // printf("list test end\n");
 }
 
 // void vector_test()
@@ -209,7 +210,7 @@ int main(int argc, char const *argv[])
     // list_test();
     // vector_test();
     //  hashmap_test();
-    benchmark_operations(1000000, 8, 2);
+    benchmark_operations(10000000, 10, 2);
     return 0;
 }
 #pragma GCC diagnostic warning "-Wunused-parameter"

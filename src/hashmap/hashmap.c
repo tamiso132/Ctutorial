@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 #include "hashmap.h"
 #include "internalhash.h"
 
@@ -10,8 +9,8 @@
 struct HashTable
 {
     size_t element_size;
-    uint32_t max_size_power_of_two;
-    uint32_t current_size;
+    size_t max_size_power_of_two;
+    size_t current_size;
     Node **array;
 };
 
@@ -22,23 +21,27 @@ static const float EXTEND_LOAD_FACTOR = 0.7;
 // private function
 void hashmap_resize(HashTable **tablee, size_t new_size);
 void hashmap_insert_resize(HashTable *table, Node *node_insert, int hash_index);
+size_t get_max_size(HashTable *table);
 
 // Function to insert a key-value pair into the hash table
 void hashmap_insert(HashTable **table, const char *key, int value)
 {
     assert(key != NULL);
+    assert(*table != NULL);
     int n_index = xxHash32(key, strlen(key), 0);
 
-    int index = calculate_modulus(n_index, (*table)->max_size_power_of_two); // FIX THIS LATER
+    size_t table_max_size = get_max_size(*table);
 
-    KeyValuePair *pair = create_pair(key, value, (*table)->element_size);
+    size_t index = calculate_modulus(n_index, (*table)->max_size_power_of_two); // FIX THIS LATER
 
-    Node *new_node = create_node(pair, n_index / ((*table)->max_size - 1));
+    KeyValuePair *pair = create_pair(key, value);
+
+    Node *new_node = create_node(pair);
     assert(new_node != NULL); // Check if create_node was successful
 
     assert((*table) != NULL);
     assert((*table)->array != NULL);
-    assert((*table)->max_size > 0);
+    assert(table_max_size > 0);
 
     if ((*table)->array[index] == NULL)
     {
@@ -51,17 +54,15 @@ void hashmap_insert(HashTable **table, const char *key, int value)
         (*table)->array[index] = new_node;
     }
     (*table)->current_size++;
-    if ((*table)->current_size > (*table)->max_size * EXTEND_LOAD_FACTOR)
+    if ((*table)->current_size > table_max_size * EXTEND_LOAD_FACTOR)
     {
-        uint32_t new_capacity = (*table)->max_size * 2;
-        hashmap_resize(table, new_capacity);
+        hashmap_resize(table, (*table)->max_size_power_of_two);
     }
-    // assert(hashmap_get(*table, key) != GET_FAILED); // Check if insertion was successful
 }
 
 int hashmap_remove(HashTable *table, const char *key) // dont shrink during remove, do it during get
 {
-    size_t hash_index = xxHash32(key, strlen(key), 0) % (table->max_size - 1);
+    size_t hash_index = calculate_modulus(xxHash32(key, strlen(key), 0), table->max_size_power_of_two);
 
     if (table->array[hash_index] != NULL)
     {
@@ -74,7 +75,10 @@ int hashmap_remove(HashTable *table, const char *key) // dont shrink during remo
 
         if (is_equal_key(node, key))
         {
+            Node *temp = table->array[hash_index];
             table->array[hash_index] = node->next;
+            table->current_size--;
+            destroy_node(temp);
             return 1;
         }
 
@@ -105,7 +109,7 @@ int hashmap_remove(HashTable *table, const char *key) // dont shrink during remo
 int hashmap_get(const HashTable *table, const char *key)
 {
     assert(key != NULL);
-    size_t index = xxHash32(key, strlen(key), 0) % (table->max_size - 1);
+    size_t index = calculate_modulus(xxHash32(key, strlen(key), 0), table->max_size_power_of_two);
 
     // Traverse the linked list to find the key
     Node *current = table->array[index];
@@ -113,7 +117,7 @@ int hashmap_get(const HashTable *table, const char *key)
     {
         if (is_equal_key(current, key))
         {
-            return current->pair.value;
+            return current->pair->value;
         }
         current = current->next;
     }
@@ -123,12 +127,12 @@ int hashmap_get(const HashTable *table, const char *key)
 }
 
 // Function to create a new hash table
-void hashmap_init(HashTable **tablee, size_t max_size, size_t element_size)
+void hashmap_init(HashTable **tablee, uint32_t power_of_two, size_t element_size)
 {
     *tablee = malloc(sizeof(HashTable));
-    (*tablee)->max_size = max_size;
+    (*tablee)->max_size_power_of_two = power_of_two;
     (*tablee)->current_size = 0;
-    (*tablee)->array = (Node **)calloc(max_size, sizeof(Node *));
+    (*tablee)->array = (Node **)calloc(1 << (*tablee)->max_size_power_of_two, sizeof(Node *));
     (*tablee)->element_size = element_size;
 
     assert(*tablee != NULL);
@@ -138,11 +142,13 @@ void hashmap_init(HashTable **tablee, size_t max_size, size_t element_size)
 // Function to free the memory used by the hash table
 void hashmap_destroy(HashTable *table)
 {
-    for (size_t i = 0; i < table->max_size; ++i)
+    size_t max_size = 1 << table->max_size_power_of_two;
+    for (size_t i = 0; i < max_size; ++i)
     {
         Node *current = table->array[i];
         while (current != NULL)
         {
+            printf("should not come here\n");
             Node *temp = current;
             current = current->next;
 
@@ -156,20 +162,20 @@ void hashmap_destroy(HashTable *table)
     free(table);
 }
 
-void hashmap_resize(HashTable **tablee, size_t new_size)
+void hashmap_resize(HashTable **tablee, size_t power_of_two)
 {
     HashTable *table = *tablee;
-    assert(new_size > 0);
+    assert(power_of_two > 0);
 
-    if (table->current_size > new_size) // shrink hashmap
+    if (table->current_size > ((size_t)1 << power_of_two)) // shrink hashmap
     {
     }
     else // extend map
     {
         HashTable *new_table;
-        hashmap_init(&new_table, table->max_size * 2, sizeof(int));
+        hashmap_init(&new_table, power_of_two + 1, sizeof(int));
 
-        for (size_t i = 0; i < table->max_size; ++i)
+        for (size_t i = 0; i < get_max_size(table); ++i)
         {
             Node *current = table->array[i];
             while (current != NULL)
@@ -178,12 +184,14 @@ void hashmap_resize(HashTable **tablee, size_t new_size)
                 // then when you resize, you can just calculate the new place without doing new hash cause u know calculate the index to %
 
                 // OPTIMIZER , POWER OF TWO MAGIC
-
                 Node *temp = current;
                 current = current->next;
 
-                size_t hash = i & (new_size - 1);
-                hashmap_insert_resize(new_table, temp, hash);
+                assert(temp != NULL);
+                assert(temp->pair.key != NULL);
+                assert(new_table != NULL);
+                hashmap_insert(&new_table, temp->pair->key, temp->pair->value);
+                destroy_node(temp);
             }
         }
         free((*tablee)->array);
@@ -209,4 +217,10 @@ void hashmap_insert_resize(HashTable *table, Node *node_insert, int hash_index)
 
     assert(table->array[hash_index] != NULL);
     table->current_size++;
+}
+
+size_t get_max_size(HashTable *table)
+{
+    size_t max_size = (1 << table->max_size_power_of_two);
+    return max_size;
 }

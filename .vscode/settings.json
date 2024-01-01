@@ -21,6 +21,7 @@
         "type_traits": "c",
         "utility": "c",
         "assert.h": "c",
-        "variant": "c"
+        "variant": "c",
+        "stdint.h": "c"
     }
 }

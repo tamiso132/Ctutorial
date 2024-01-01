@@ -35,4 +35,32 @@ target_compile_definitions(test_executable PRIVATE TEST_MODE)
 set_target_properties(test_executable PROPERTIES OUTPUT_NAME test_executable)
 set_target_properties(test_executable PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-# Enable assert in test_executable
+
+target_compile_options(test_executable PRIVATE
+    $<$<CONFIG:Debug>:
+        -O0       # No optimization
+        -g        # Generate debugging information
+        -Wall
+        -Wextra
+        -Werror
+        -fsanitize=undefined
+        -fsanitize=address
+    >
+)
+
+
+
+target_link_libraries(test_executable PRIVATE
+$<$<CONFIG:Debug>:
+    -fsanitize=undefined
+    -fsanitize=address
+    >
+)
+
+# Compiler options for Release build
+target_compile_options(test_executable PRIVATE
+    $<$<CONFIG:Release>:
+        -O3       # Aggressive optimization
+    >
+)
+
