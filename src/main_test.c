@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "allocator/alloc.h"
 #include "collection/linkedlist.h"
 #include "collection/vector.h"
 #include "hashmap/hashmap.h"
@@ -222,10 +223,20 @@ void list_test()
 #pragma GCC diagnostic ignored "-Wunused-parameter" // for disable main parameter warning
 int main(int argc, char const *argv[])
 {
+
+    Vector *v;
+    v = allocate_memory(sizeof(Vector));
+
+    v->element_size = 10;
+    v->capacity = 20;
+    printf("Capacity: %d\n", v->capacity);
+    printf("Size: %d\n", v->element_size);
+
+    printf("memory adress %p\n", v);
     // list_test();
     // vector_test();
     //  hashmap_test();
-    benchmark_operations(1000000, 10, 5);
+    benchmark_operations(1000000, 5, 5);
     return 0;
 }
 #pragma GCC diagnostic warning "-Wunused-parameter"

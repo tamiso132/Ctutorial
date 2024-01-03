@@ -25,8 +25,6 @@ struct HashTable
     Node **array;
 };
 
-KeyValuePair *create_pair(const char *key, int value);
-Node *create_node(KeyValuePair *pair);
 void destroy_node(Node *node);
 
 void hashmap_resize(HashTable **tablee, size_t new_size);
@@ -60,9 +58,19 @@ void hashmap_insert(HashTable **table, const char *key, int value)
 
     size_t index = calculate_modulus(n_index, table_deref->max_size_power_of_two); // FIX THIS LATER
 
-    KeyValuePair *pair = create_pair(key, value);
+    KeyValuePair *pair = malloc(sizeof(KeyValuePair));
+    pair.
+    pair.key = malloc(strlen(key) + 1);
 
-    Node *new_node = create_node(pair);
+    //  KeyValuePair pair;
+    // pair.key = malloc(strlen(key) + 1);
+    // pair.value = value;
+
+    // strcpy(pair.key, key);
+
+    Node *new_node = malloc(sizeof(Node));
+    new_node->next = NULL;
+    new_node->pair = pair;
 
     new_node->next = table_deref->array[index];
     table_deref->array[index] = new_node;
@@ -84,7 +92,6 @@ int hashmap_remove(HashTable *table, const char *key) // dont shrink during remo
         Node *prev = table->array[hash_index];
 
         assert(&node->pair != NULL);
-        assert(&node->pair->key != NULL);
 
         if (is_equal_key(node, key))
         {
@@ -101,7 +108,6 @@ int hashmap_remove(HashTable *table, const char *key) // dont shrink during remo
         while (node != NULL)
         {
             assert(&node->pair != NULL);
-            assert(&node->pair->key != NULL);
 
             if (is_equal_key(node, key))
             {
@@ -129,7 +135,7 @@ int hashmap_get(const HashTable *table, const char *key)
     {
         if (is_equal_key(current, key))
         {
-            return current->pair->value;
+            return current->pair.value;
         }
         current = current->next;
     }
@@ -206,7 +212,8 @@ void hashmap_resize(HashTable **tablee, size_t power_of_two)
                 Node *temp = current;
                 current = current->next;
 
-                char *key = temp->pair->key;
+                char *key = temp->pair.key;
+                printf("Key: %s\n", key);
                 size_t index = calculate_modulus(xxHash32(key, strlen(key), 0), power_of_two);
 
                 temp->next = new_table->array[index];
@@ -220,34 +227,10 @@ void hashmap_resize(HashTable **tablee, size_t power_of_two)
     }
 }
 
-KeyValuePair *create_pair(const char *key, int value)
-{
-    KeyValuePair *pair = (KeyValuePair *)malloc(sizeof(KeyValuePair));
-    pair->key = malloc(strlen(key) + 1);
-    pair->value = value;
-
-    strcpy(pair->key, key);
-    assert(pair->key != NULL);
-    return pair;
-}
-
-// Function to create a new node
-Node *create_node(KeyValuePair *pair)
-{
-    assert(pair != NULL);
-    Node *node = (Node *)malloc(sizeof(Node));
-    node->pair = pair;
-    node->next = NULL;
-
-    return node;
-}
 void destroy_node(Node *node)
 {
-    assert(node->pair->key != NULL);
     assert(node != NULL);
 
-    free(node->pair->key);
-    free(node->pair);
     free(node);
 }
 
@@ -350,10 +333,8 @@ uint32_t XXH_read32(const void *memPtr)
 
 int is_equal_key(const Node *one, const char *key)
 {
-    assert(one->pair != NULL);
-    assert(one->pair->key != NULL);
 
-    char *key_one = one->pair->key;
+    char *key_one = one->pair.key;
 
     if (strcmp(key_one, key) == 0)
     {

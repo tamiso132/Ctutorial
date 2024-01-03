@@ -1,11 +1,33 @@
-#include <stdint.h>
 
-#define MAX_ALLOCATION 1024
+#include "alloc.h"
 
-static unsigned int FIXED_BLOCK;
+#define MAX_SIZE 4096
+#define RESERVED_BYTES 32
 
-const char BUFFER[MAX_ALLOCATION];
+typedef struct Node // 32 bytes are reserved
+{
+    uint16_t size;
+    uint16_t prev_size;
+    // here is the size
+} Node;
 
-void *custom_malloc(uint32_t blocks)
+static char *Memory[MAX_SIZE];
+// 32 bytes are reserved
+
+static uint32_t index = 0;
+static uint32_t prev_val = 0;
+
+void *allocate_memory(uint32_t size)
+{
+    Node *node = &(Memory[index]);
+    node->size = size;
+    node->prev_size = prev_val;
+    prev_val = size;
+
+    index += size + RESERVED_BYTES;
+    return (void *)&node[RESERVED_BYTES];
+}
+
+void free_memory(void *pointer)
 {
 }
