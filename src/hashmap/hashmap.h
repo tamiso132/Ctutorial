@@ -3,15 +3,22 @@
 #include <assert.h>
 #include <stddef.h> // for size_t
 #include <stdint.h>
-#include <stdlib.h> // for malloc, free
-#include <string.h> // for strdup, strlen
 
-typedef struct HashTable HashTable;
+typedef struct Node Node;
 
-void hashmap_insert(HashTable **table, const char *key, int value);
+typedef struct HashTable
+{
+    size_t element_size;
+    size_t max_size_power_of_two;
+    size_t current_size;
+    size_t max_size_allowed;
+    Node **array;
+} HashTable;
+
+void hashmap_insert(HashTable *table, const char *key, int value);
 int hashmap_remove(HashTable *table, const char *key);
-int hashmap_get(const HashTable *table, const char *key);
-void hashmap_init(HashTable **table, uint32_t max_size, size_t element_size);
+int hashmap_get(const HashTable *table, const char *key, int *found);
+void hashmap_init(HashTable *table, uint32_t max_size, size_t element_size);
 void hashmap_destroy(HashTable *table);
 
 // for benchmarking

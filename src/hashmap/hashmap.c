@@ -1,85 +1,63 @@
 #include <stdio.h>
+#include <stdlib.h> // for malloc, free
+#include <string.h> // for strdup, strlen
 #include "hashmap.h"
 
 static const float EXTEND_LOAD_FACTOR = 0.7;
 #define GET_FAILED INT32_MAX - 1
 
-typedef struct KeyValuePair
+typedef struct Node
 {
     char *key;
     int value;
-} KeyValuePair;
-
-typedef struct Node
-{
-    KeyValuePair *pair;
     struct Node *next;
 } Node;
 
-struct HashTable
-{
-    size_t element_size;
-    size_t max_size_power_of_two;
-    size_t current_size;
-    size_t max_size_allowed;
-    Node **array;
-};
+static void destroy_node(Node *node);
 
-void destroy_node(Node *node);
+static void hashmap_resize(HashTable *tablee, size_t new_size);
 
-void hashmap_resize(HashTable **tablee, size_t new_size);
-size_t get_max_size(HashTable *table);
+static size_t get_max_size(const HashTable *table);
 
 ////////////////////////////////////////////////////////////////////////////////
 //// HELPER FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 uint32_t xxHash32(const void *input, size_t length, uint32_t seed);
 
-size_t calculate_modulus(int value, size_t powerOfTwo);
+static size_t calculate_modulus(int value, size_t powerOfTwo);
 
-int is_equal_key(const Node *one, const char *key);
+static int is_equal_key(const Node *one, const char *key);
 
-uint32_t XXH32_rotl(uint32_t x, int r);
+static uint32_t XXH32_rotl(uint32_t x, int r);
 
-uint32_t XXH32_round(uint32_t acc, uint32_t input);
+static uint32_t XXH32_round(uint32_t acc, uint32_t input);
 
-uint32_t XXH32_mergeAccs(uint32_t acc1, uint32_t acc2, uint32_t acc3, uint32_t acc4);
+static uint32_t XXH32_mergeAccs(uint32_t acc1, uint32_t acc2, uint32_t acc3, uint32_t acc4);
 
-uint32_t XXH_read32(const void *memPtr);
+static uint32_t XXH_read32(const void *memPtr);
 
 // Function to insert a key-value pair into the hash table
-void hashmap_insert(HashTable **table, const char *key, int value)
+void hashmap_insert(HashTable *table, const char *key, int value)
 {
-    assert(key != NULL);
-    assert(*table != NULL);
-    HashTable *table_deref = *table;
 
-    int n_index = xxHash32(key, strlen(key), 0);
+    printf("DESTROY\n");
+    int n_index = xxHash32(key, strlen(key), 0); // TODO change strlen, unsafe
 
-    size_t index = calculate_modulus(n_index, table_deref->max_size_power_of_two); // FIX THIS LATER
-
-    KeyValuePair *pair = malloc(sizeof(KeyValuePair));
-    pair->key = malloc(strlen(key) + 1);
-    strcpy(pair->key, key);
-    pair->value = value;
-
-    //  KeyValuePair pair;
-    // pair.key = malloc(strlen(key) + 1);
-    // pair.value = value;
-
-    // strcpy(pair.key, key);
+    size_t index = calculate_modulus(n_index, table->max_size_power_of_two); // FIX THIS LATER
 
     Node *new_node = malloc(sizeof(Node));
     new_node->next = NULL;
-    new_node->pair = pair;
+    new_node->value = value;
+    new_node->key = malloc(strlen(key) + 1);
+    strcpy(new_node->key, key);
 
-    new_node->next = table_deref->array[index];
-    table_deref->array[index] = new_node;
+    new_node->next = table->array[index];
+    table->array[index] = new_node;
 
-    table_deref->current_size++;
-    if (table_deref->current_size > table_deref->max_size_allowed)
+    table->current_size++;
+    if (table->current_size > table->max_size_allowed)
     {
-        hashmap_resize(table, table_deref->max_size_power_of_two);
+        hashmap_resize(table, table->max_size_power_of_two);
     }
 }
 
@@ -91,8 +69,6 @@ int hashmap_remove(HashTable *table, const char *key) // dont shrink during remo
     {
         Node *node = table->array[hash_index];
         Node *prev = table->array[hash_index];
-
-        assert(&node->pair != NULL);
 
         if (is_equal_key(node, key))
         {
@@ -108,7 +84,6 @@ int hashmap_remove(HashTable *table, const char *key) // dont shrink during remo
 
         while (node != NULL)
         {
-            assert(&node->pair != NULL);
 
             if (is_equal_key(node, key))
             {
@@ -125,7 +100,7 @@ int hashmap_remove(HashTable *table, const char *key) // dont shrink during remo
 }
 
 // return -1 if not found
-int hashmap_get(const HashTable *table, const char *key)
+int hashmap_get(const HashTable *table, const char *key, int *found)
 {
     assert(key != NULL);
     size_t index = calculate_modulus(xxHash32(key, strlen(key), 0), table->max_size_power_of_two);
@@ -136,7 +111,8 @@ int hashmap_get(const HashTable *table, const char *key)
     {
         if (is_equal_key(current, key))
         {
-            return current->pair->value;
+            *found = current->value;
+            return 0;
         }
         current = current->next;
     }
@@ -147,17 +123,16 @@ int hashmap_get(const HashTable *table, const char *key)
 }
 
 // Function to create a new hash table
-void hashmap_init(HashTable **tablee, uint32_t power_of_two, size_t element_size)
+void hashmap_init(HashTable *tablee, uint32_t power_of_two, size_t element_size)
 {
-    *tablee = malloc(sizeof(HashTable));
-    HashTable *table_deref = *tablee;
+    HashTable table_deref = *tablee;
 
-    table_deref->max_size_power_of_two = power_of_two;
-    table_deref->current_size = 0;
-    table_deref->max_size_allowed = EXTEND_LOAD_FACTOR * get_max_size(table_deref);
+    tablee->max_size_power_of_two = power_of_two;
+    tablee->current_size = 0;
+    tablee->max_size_allowed = EXTEND_LOAD_FACTOR * get_max_size(tablee);
 
-    table_deref->array = (Node **)calloc(1 << (*tablee)->max_size_power_of_two, sizeof(Node *));
-    table_deref->element_size = element_size;
+    tablee->array = (Node **)calloc(1 << table_deref.max_size_power_of_two, sizeof(Node *));
+    tablee->element_size = element_size;
 }
 
 // Function to free the memory used by the hash table
@@ -183,13 +158,12 @@ void hashmap_destroy(HashTable *table)
     free(table);
 }
 
-///////////////////&
+///////////////////
 /////PRIVATE FUNCTIONS
 ////////////////////
 
-void hashmap_resize(HashTable **tablee, size_t power_of_two)
+static void hashmap_resize(HashTable *table, size_t power_of_two)
 {
-    HashTable *table = *tablee;
     assert(power_of_two > 0);
 
     if (table->current_size > ((size_t)1 << power_of_two)) // shrink hashmap
@@ -197,44 +171,38 @@ void hashmap_resize(HashTable **tablee, size_t power_of_two)
     }
     else // extend map
     {
-        HashTable *new_table;
+        HashTable new_table;
         hashmap_init(&new_table, power_of_two + 1, sizeof(int));
-        size_t power_of_two = new_table->max_size_power_of_two;
+        size_t power_of_two = new_table.max_size_power_of_two;
 
         for (size_t i = 0; i < get_max_size(table); ++i)
         {
             Node *current = table->array[i];
             while (current != NULL)
             {
-                // OPTIMIZER CAN BE MADE, HAVE A NODE SAVE THE AMOUNT OF modules it took for it to get index
-                // then when you resize, you can just calculate the new place without doing new hash cause u know calculate the index to %
-
-                // OPTIMIZER , POWER OF TWO MAGIC
                 Node *temp = current;
                 current = current->next;
 
-                char *key = temp->pair->key;
+                char *key = temp->key;
                 size_t index = calculate_modulus(xxHash32(key, strlen(key), 0), power_of_two);
 
-                temp->next = new_table->array[index];
-                new_table->array[index] = temp;
+                temp->next = new_table.array[index];
+                new_table.array[index] = temp;
             }
         }
-        free((*tablee)->array);
-        free((*tablee));
-
-        *tablee = new_table;
+        free(table->array);
+        table->array = new_table.array;
     }
 }
 
-void destroy_node(Node *node)
+static void destroy_node(Node *node)
 {
     assert(node != NULL);
 
     free(node);
 }
 
-size_t get_max_size(HashTable *table)
+static size_t get_max_size(const HashTable *table)
 {
     return (1 << table->max_size_power_of_two);
 }
@@ -305,20 +273,19 @@ uint32_t xxHash32(const void *input, size_t length, uint32_t seed)
 
 // Helper functions
 
-uint32_t XXH32_rotl(uint32_t x, int r)
+static uint32_t XXH32_rotl(uint32_t x, int r)
 {
     return (x << r) | (x >> (32 - r));
 }
 
-uint32_t XXH32_round(uint32_t acc, uint32_t input)
+static uint32_t XXH32_round(uint32_t acc, uint32_t input)
 {
     acc += input * PRIME32_2;
     acc = XXH32_rotl(acc, 13);
     acc *= PRIME32_1;
     return acc;
 }
-
-uint32_t XXH32_mergeAccs(uint32_t acc1, uint32_t acc2, uint32_t acc3, uint32_t acc4)
+static uint32_t XXH32_mergeAccs(uint32_t acc1, uint32_t acc2, uint32_t acc3, uint32_t acc4)
 {
     acc1 = XXH32_round(acc1, acc2);
     acc1 = XXH32_round(acc1, acc3);
@@ -326,15 +293,15 @@ uint32_t XXH32_mergeAccs(uint32_t acc1, uint32_t acc2, uint32_t acc3, uint32_t a
     return acc1;
 }
 
-uint32_t XXH_read32(const void *memPtr)
+static uint32_t XXH_read32(const void *memPtr)
 {
     return *(const uint32_t *)memPtr;
 }
 
-int is_equal_key(const Node *one, const char *key)
+static int is_equal_key(const Node *one, const char *key)
 {
 
-    char *key_one = one->pair->key;
+    char *key_one = one->key;
 
     if (strcmp(key_one, key) == 0)
     {
@@ -343,7 +310,7 @@ int is_equal_key(const Node *one, const char *key)
     return 0;
 }
 
-size_t calculate_modulus(int value, size_t powerOfTwo)
+static size_t calculate_modulus(int value, size_t powerOfTwo)
 {
     return (size_t)value & ((1 << powerOfTwo) - 1);
 }

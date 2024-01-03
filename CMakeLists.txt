@@ -37,7 +37,7 @@ add_executable(test_executable ${SOURCES} ${HEADERS} src/main_test.c)
 set_target_properties(test_executable PROPERTIES OUTPUT_NAME test_executable)
 set_target_properties(test_executable PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-
+if(UNIX)
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 target_compile_options(test_executable PRIVATE
     $<$<CONFIG:Debug>:
@@ -77,7 +77,32 @@ $<$<CONFIG:Debug>:
     >
 )
 endif()
+endif()
 
+
+if (MSVC)
+    target_compile_options(test_executable PRIVATE
+    $<$<CONFIG:Debug>:
+        -O0       # No optimization
+        -g        # Generate debugging information
+        -Wall
+        -Wextra
+        -Werror
+    >
+)
+
+target_compile_options(myexecutable PRIVATE
+    $<$<CONFIG:Debug>:
+        -O0       # No optimization
+        -g        # Generate debugging information
+        -Wall
+        -Wextra
+        -Werror
+    >
+)
+
+
+endif()
 
 
 

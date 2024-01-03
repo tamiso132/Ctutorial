@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #include "allocator/alloc.h"
 #include "collection/linkedlist.h"
@@ -12,7 +13,6 @@
 
 void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat)
 {
-    assert(1 == 0);
     int repeat_clone = repeat;
     double insertion_total = 0;
     double retrive_total = 0;
@@ -20,12 +20,11 @@ void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat
     double hash_total = 0;
     while (repeat_clone > 0)
     {
-        HashTable *table;
+        HashTable table;
         size_t i;
 
         printf("Number of operations in respective benching %ld\n", num_operations);
         clock_t start_time = clock();
-
         for (i = 0; i < num_operations; ++i)
         {
             char key[20];
@@ -33,7 +32,6 @@ void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat
 
             xxHash32(key, strlen(key), 0);
         }
-
         clock_t end_time = clock();
         hash_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
         // Benchmark retrievals
@@ -41,6 +39,7 @@ void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat
 
         // Initialize the hash table
         hashmap_init(&table, hashmap_size, sizeof(int));
+        printf("DESTROY \n");
         // Benchmark insertions
         start_time = clock();
         for (i = 0; i < num_operations; ++i)
@@ -52,13 +51,15 @@ void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat
         }
         end_time = clock();
         insertion_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
+        printf("DESTROY \n");
         // Benchmark retrievals
         start_time = clock();
         for (i = 0; i < num_operations; ++i)
         {
             char key[20];
             sprintf(key, "key%d", (int)i);
-            hashmap_get(table, key);
+            int val;
+            hashmap_get(&table, key, &val);
         }
         end_time = clock();
         retrive_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
@@ -68,13 +69,14 @@ void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat
         {
             char key[20];
             sprintf(key, "key%d", (int)i);
-            hashmap_remove(table, key);
+            hashmap_remove(&table, key);
         }
         end_time = clock();
         removal_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
 
         // // Destroy the hash table
-        hashmap_destroy(table);
+        printf("DESTROY \n");
+        hashmap_destroy(&table);
         repeat_clone--;
     }
 
@@ -224,18 +226,6 @@ void list_test()
 int main(int argc, char const *argv[])
 {
 
-    Vector *v;
-    v = allocate_memory(sizeof(Vector));
-
-    v->element_size = 10;
-    v->capacity = 20;
-    printf("Capacity: %d\n", v->capacity);
-    printf("Size: %d\n", v->element_size);
-
-    printf("memory adress %p\n", v);
-    // list_test();
-    // vector_test();
-    //  hashmap_test();
     benchmark_operations(1000000, 5, 5);
     return 0;
 }
