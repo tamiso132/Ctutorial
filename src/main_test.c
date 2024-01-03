@@ -1,4 +1,3 @@
-#define NDEBUG
 
 #include <stddef.h>
 #include <stdio.h>
@@ -17,17 +16,32 @@ void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat
     double insertion_total = 0;
     double retrive_total = 0;
     double removal_total = 0;
+    double hash_total = 0;
     while (repeat_clone > 0)
     {
         HashTable *table;
         size_t i;
 
         printf("Number of operations in respective benching %ld\n", num_operations);
+        clock_t start_time = clock();
+
+        for (i = 0; i < num_operations; ++i)
+        {
+            char key[20];
+            sprintf(key, "key%d", (int)i);
+
+            xxHash32(key, strlen(key), 0);
+        }
+
+        clock_t end_time = clock();
+        hash_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
+        // Benchmark retrievals
+        start_time = clock();
 
         // Initialize the hash table
         hashmap_init(&table, hashmap_size, sizeof(int));
         // Benchmark insertions
-        clock_t start_time = clock();
+        start_time = clock();
         for (i = 0; i < num_operations; ++i)
         {
             char key[20];
@@ -35,7 +49,7 @@ void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat
             int value = i;
             hashmap_insert(&table, key, value);
         }
-        clock_t end_time = clock();
+        end_time = clock();
         insertion_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
         // Benchmark retrievals
         start_time = clock();
@@ -66,6 +80,7 @@ void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat
     printf("\nInsertions took %f seconds\n", insertion_total / repeat);
     printf("Retrievals took %f seconds\n", retrive_total / repeat);
     printf("Removals took %f seconds\n\n", removal_total / repeat);
+    printf("hashing took %f seconds\n\n", hash_total / repeat);
 }
 
 void hashmap_test()
@@ -210,7 +225,7 @@ int main(int argc, char const *argv[])
     // list_test();
     // vector_test();
     //  hashmap_test();
-    benchmark_operations(10000000, 10, 2);
+    benchmark_operations(1000000, 10, 5);
     return 0;
 }
 #pragma GCC diagnostic warning "-Wunused-parameter"

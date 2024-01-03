@@ -29,13 +29,16 @@ set_target_properties(myexecutable PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_
 # Add the test executable target
 add_executable(test_executable ${SOURCES} ${HEADERS} src/main_test.c)
 
-# Set TEST_MODE to 1 for the test executable
-target_compile_definitions(test_executable PRIVATE TEST_MODE)
+
+
+
+# TEST EXECUTABLE
 
 set_target_properties(test_executable PROPERTIES OUTPUT_NAME test_executable)
 set_target_properties(test_executable PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 
+if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 target_compile_options(test_executable PRIVATE
     $<$<CONFIG:Debug>:
         -O0       # No optimization
@@ -48,8 +51,6 @@ target_compile_options(test_executable PRIVATE
     >
 )
 
-
-
 target_link_libraries(test_executable PRIVATE
 $<$<CONFIG:Debug>:
     -fsanitize=undefined
@@ -57,8 +58,38 @@ $<$<CONFIG:Debug>:
     >
 )
 
+target_compile_options(myexecutable PRIVATE
+    $<$<CONFIG:Debug>:
+        -O0       # No optimization
+        -g        # Generate debugging information
+        -Wall
+        -Wextra
+        -Werror
+        -fsanitize=undefined
+        -fsanitize=address
+    >
+)
+
+target_link_libraries(myexecutable PRIVATE
+$<$<CONFIG:Debug>:
+    -fsanitize=undefined
+    -fsanitize=address
+    >
+)
+endif()
+
+
+
+
 # Compiler options for Release build
 target_compile_options(test_executable PRIVATE
+    $<$<CONFIG:Release>:
+        -O3       # Aggressive optimization
+    >
+)
+
+# Compiler options for Release build
+target_compile_options(myexecutable PRIVATE
     $<$<CONFIG:Release>:
         -O3       # Aggressive optimization
     >

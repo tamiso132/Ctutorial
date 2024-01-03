@@ -8,3 +8,5 @@ cmake --build .
 cd bin
 ./test_executable
 cd ../../
+
+# -Release , -Debug
