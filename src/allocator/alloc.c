@@ -19,7 +19,7 @@ static uint32_t prev_val = 0;
 
 void *allocate_memory(uint32_t size)
 {
-    Node *node = &(Memory[index]);
+    Node *node = (Node *)&(Memory[index]);
     node->size = size;
     node->prev_size = prev_val;
     prev_val = size;

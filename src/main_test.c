@@ -12,7 +12,7 @@
 
 void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat)
 {
-
+    assert(1 == 0);
     int repeat_clone = repeat;
     double insertion_total = 0;
     double retrive_total = 0;

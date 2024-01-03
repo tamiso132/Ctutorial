@@ -59,8 +59,9 @@ void hashmap_insert(HashTable **table, const char *key, int value)
     size_t index = calculate_modulus(n_index, table_deref->max_size_power_of_two); // FIX THIS LATER
 
     KeyValuePair *pair = malloc(sizeof(KeyValuePair));
-    pair.
-    pair.key = malloc(strlen(key) + 1);
+    pair->key = malloc(strlen(key) + 1);
+    strcpy(pair->key, key);
+    pair->value = value;
 
     //  KeyValuePair pair;
     // pair.key = malloc(strlen(key) + 1);
@@ -135,7 +136,7 @@ int hashmap_get(const HashTable *table, const char *key)
     {
         if (is_equal_key(current, key))
         {
-            return current->pair.value;
+            return current->pair->value;
         }
         current = current->next;
     }
@@ -212,8 +213,7 @@ void hashmap_resize(HashTable **tablee, size_t power_of_two)
                 Node *temp = current;
                 current = current->next;
 
-                char *key = temp->pair.key;
-                printf("Key: %s\n", key);
+                char *key = temp->pair->key;
                 size_t index = calculate_modulus(xxHash32(key, strlen(key), 0), power_of_two);
 
                 temp->next = new_table->array[index];
@@ -334,7 +334,7 @@ uint32_t XXH_read32(const void *memPtr)
 int is_equal_key(const Node *one, const char *key)
 {
 
-    char *key_one = one->pair.key;
+    char *key_one = one->pair->key;
 
     if (strcmp(key_one, key) == 0)
     {
