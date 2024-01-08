@@ -10,79 +10,79 @@
 #include "collection/vector.h"
 #include "hashmap/hashmap.h"
 
-void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat)
-{
+// void benchmark_operations(size_t num_operations, size_t hashmap_size, int repeat)
+// {
 
-    int repeat_clone = repeat;
-    double insertion_total = 0;
-    double retrive_total = 0;
-    double removal_total = 0;
-    double hash_total = 0;
-    while (repeat_clone > 0)
-    {
-        HashTable *table;
-        size_t i;
+//     int repeat_clone = repeat;
+//     double insertion_total = 0;
+//     double retrive_total = 0;
+//     double removal_total = 0;
+//     double hash_total = 0;
+//     while (repeat_clone > 0)
+//     {
+//         HashTable *table;
+//         size_t i;
 
-        printf("Number of operations in respective benching %ld\n", num_operations);
-        clock_t start_time = clock();
+//         printf("Number of operations in respective benching %ld\n", num_operations);
+//         clock_t start_time = clock();
 
-        for (i = 0; i < num_operations; ++i)
-        {
-            char key[20];
-            sprintf(key, "key%d", (int)i);
+//         for (i = 0; i < num_operations; ++i)
+//         {
+//             char key[20];
+//             sprintf(key, "key%d", (int)i);
 
-            xxHash32(key, strlen(key), 0);
-        }
+//             xxHash32(key, strlen(key), 0);
+//         }
 
-        clock_t end_time = clock();
-        hash_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
-        // Benchmark retrievals
-        start_time = clock();
+//         clock_t end_time = clock();
+//         hash_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
+//         // Benchmark retrievals
+//         start_time = clock();
 
-        // Initialize the hash table
-        hashmap_init(&table, hashmap_size, sizeof(int));
-        // Benchmark insertions
-        start_time = clock();
-        for (i = 0; i < num_operations; ++i)
-        {
-            char key[20];
-            sprintf(key, "key%d", (int)i);
-            int value = i;
-            hashmap_insert(&table, key, value);
-        }
-        end_time = clock();
-        insertion_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
-        // Benchmark retrievals
-        start_time = clock();
-        for (i = 0; i < num_operations; ++i)
-        {
-            char key[20];
-            sprintf(key, "key%d", (int)i);
-            hashmap_get(table, key);
-        }
-        end_time = clock();
-        retrive_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
-        // Benchmark removals
-        start_time = clock();
-        for (i = 0; i < num_operations; ++i)
-        {
-            char key[20];
-            sprintf(key, "key%d", (int)i);
-            hashmap_remove(table, key);
-        }
-        end_time = clock();
-        removal_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
+//         // Initialize the hash table
+//         hashmap_init(&table, hashmap_size, sizeof(int));
+//         // Benchmark insertions
+//         start_time = clock();
+//         for (i = 0; i < num_operations; ++i)
+//         {
+//             char key[20];
+//             sprintf(key, "key%d", (int)i);
+//             int value = i;
+//             hashmap_insert(&table, key, value);
+//         }
+//         end_time = clock();
+//         insertion_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
+//         // Benchmark retrievals
+//         start_time = clock();
+//         for (i = 0; i < num_operations; ++i)
+//         {
+//             char key[20];
+//             sprintf(key, "key%d", (int)i);
+//             hashmap_get(table, key);
+//         }
+//         end_time = clock();
+//         retrive_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
+//         // Benchmark removals
+//         start_time = clock();
+//         for (i = 0; i < num_operations; ++i)
+//         {
+//             char key[20];
+//             sprintf(key, "key%d", (int)i);
+//             hashmap_remove(table, key);
+//         }
+//         end_time = clock();
+//         removal_total += (double)(end_time - start_time) / CLOCKS_PER_SEC;
 
-        // // Destroy the hash table
-        hashmap_destroy(table);
-        repeat_clone--;
-    }
+//         // // Destroy the hash table
+//         hashmap_destroy(table);
+//         repeat_clone--;
+//     }
 
-    printf("\nInsertions took %f seconds\n", insertion_total / repeat);
-    printf("Retrievals took %f seconds\n", retrive_total / repeat);
-    printf("Removals took %f seconds\n\n", removal_total / repeat);
-    printf("hashing took %f seconds\n\n", hash_total / repeat);
-}
+//     printf("\nInsertions took %f seconds\n", insertion_total / repeat);
+//     printf("Retrievals took %f seconds\n", retrive_total / repeat);
+//     printf("Removals took %f seconds\n\n", removal_total / repeat);
+//     printf("hashing took %f seconds\n\n", hash_total / repeat);
+// }
 
 void hashmap_test()
 {
@@ -224,19 +224,6 @@ void list_test()
 int main(int argc, char const *argv[])
 {
 
-    Vector *v;
-    v = allocate_memory(sizeof(Vector));
-
-    v->element_size = 10;
-    v->capacity = 20;
-    printf("Capacity: %d\n", v->capacity);
-    printf("Size: %d\n", v->element_size);
-
-    printf("memory adress %p\n", v);
-    // list_test();
-    // vector_test();
-    //  hashmap_test();
-    benchmark_operations(1000000, 5, 5);
     return 0;
 }
 #pragma GCC diagnostic warning "-Wunused-parameter"

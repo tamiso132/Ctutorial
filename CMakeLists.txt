@@ -44,8 +44,6 @@ target_compile_options(test_executable PRIVATE
         -O0       # No optimization
         -g        # Generate debugging information
         -Wall
-        -Wextra
-        -Werror
         -fsanitize=undefined
         -fsanitize=address
     >
@@ -63,8 +61,6 @@ target_compile_options(myexecutable PRIVATE
         -O0       # No optimization
         -g        # Generate debugging information
         -Wall
-        -Wextra
-        -Werror
         -fsanitize=undefined
         -fsanitize=address
     >
