@@ -1,6 +1,13 @@
 # Set the minimum required CMake version
 cmake_minimum_required(VERSION 3.5)
 
+
+# building xxHash library
+# TODO, try to extract it out of here
+set(CMAKE_PREFIX_PATH "/home/tom/Downloads/xxHash-dev/build/")
+find_package(xxHash REQUIRED)
+
+
 # set( CMAKE_CXX_COMPILER "C:/Users/tomalb21/Desktop/mingw32/bin")
 # set( CMAKE_C_COMPILER "C:/Users/tomalb21/Desktop/mingw32/bin" )
 
@@ -22,6 +29,8 @@ file(GLOB_RECURSE HEADERS "src/**/*.h")
 # Add the executable target
 add_executable(myexecutable ${SOURCES} ${HEADERS} src/main.c)
 
+target_link_libraries(myexecutable PRIVATE xxhash)
+
 # Set output name and folder
 set_target_properties(myexecutable PROPERTIES OUTPUT_NAME MyProjectC)
 set_target_properties(myexecutable PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
@@ -29,7 +38,7 @@ set_target_properties(myexecutable PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_
 # Add the test executable target
 add_executable(test_executable ${SOURCES} ${HEADERS} src/main_test.c)
 
-
+target_link_libraries(test_executable PRIVATE xxhash)
 
 
 # TEST EXECUTABLE
@@ -42,10 +51,17 @@ if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
 target_compile_options(test_executable PRIVATE
     $<$<CONFIG:Debug>:
         -O0       # No optimization
+        -lxxhash
         -g        # Generate debugging information
         -Wall
+        -Wextra
+        -Wcast-qual
         -fsanitize=undefined
         -fsanitize=address
+        -Wstrict-aliasing=3
+        -Wpointer-arith
+        -Wswitch-enum
+        -Wredundant-decls
     >
 )
 

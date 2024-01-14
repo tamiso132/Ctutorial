@@ -13,16 +13,21 @@ EntityId entity_add()
     return id;
 }
 
-uint64_t entity_get_index(EntityId entity)
+uint32_t entity_get_index(EntityId entity)
 {
     return entity.id & 0xFFFF;
 }
-uint64_t entity_get_generation(EntityId entity)
+uint32_t entity_get_generation(EntityId entity)
 {
-    return (uint32_t)(entity.id >> 32);
+    return (uint32_t)(entity.id >> 31);
 }
 
-void entity_generate(EntityId entity)
+void entity_generate(EntityId *entity)
 {
-    entity.id = entity.id & 0xFFFF | (((entity.id << 31) & 0xFFFF) + 1) << 31;
+    uint32_t generation = entity->id >> 31;
+    generation++;
+
+    entity->id = ((long)generation << 31) | (entity->id & 0xFFFF);
+
+    printf("generation id: %d\n", entity_get_generation(*entity));
 }

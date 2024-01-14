@@ -22,6 +22,8 @@
         "utility": "c",
         "assert.h": "c",
         "variant": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "xxhash.h": "c",
+        "cstdint": "c"
     }
 }
