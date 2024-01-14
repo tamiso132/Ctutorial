@@ -13,9 +13,8 @@
 
 void benchmark_operations()
 {
-    Hashmap table;
-    hashmap_init(&table);
-    hashmap_destroy(&table);
+    // hashmap_init(&table);
+    // hashmap_destroy(&table);
 }
 
 #pragma GCC diagnostic ignored "-Wunused-parameter" // for disable main parameter warning

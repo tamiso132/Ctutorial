@@ -24,6 +24,9 @@
         "variant": "c",
         "stdint.h": "c",
         "xxhash.h": "c",
-        "cstdint": "c"
+        "cstdint": "c",
+        "macro.h": "c",
+        "typeinfo": "c",
+        "unordered_map": "c"
     }
 }

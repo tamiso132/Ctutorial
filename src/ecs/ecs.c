@@ -4,6 +4,9 @@
 
 uint16_t current_index;
 
+// component id / archtypeset
+static HashmapSet component_index;
+
 EntityId entity_add()
 {
     EntityId id;
@@ -28,6 +31,4 @@ void entity_generate(EntityId *entity)
     generation++;
 
     entity->id = ((long)generation << 31) | (entity->id & 0xFFFF);
-
-    printf("generation id: %d\n", entity_get_generation(*entity));
 }

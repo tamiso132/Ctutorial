@@ -62,6 +62,7 @@ target_compile_options(test_executable PRIVATE
         -Wpointer-arith
         -Wswitch-enum
         -Wredundant-decls
+        -fcompare-debug-second
     >
 )
 
