@@ -1,1 +1,0 @@
-valgrind build/bin/test_executable --full-leak
