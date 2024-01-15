@@ -7,13 +7,12 @@
 #include "datastructure.h"
 #include "ecs.h"
 
-
 uint16_t current_index;
 
 // mapped to archetype index
 static Vector all_archetypes;
 
-
+static HashmapU32 components;
 
 EntityId *entity_add()
 {
