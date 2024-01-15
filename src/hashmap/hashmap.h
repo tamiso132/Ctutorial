@@ -21,7 +21,7 @@ void SetU64_destroy(SetU64 *table);
 void SetU64_remove(SetU64 *table, uint64_t key);
 uint64_t *SetU64_get(const SetU64 *table, uint64_t key);
 
-typedef struct MyNode
+typedef struct MyNode // TODO, HAVE TO VALUE AFTER MyNode
 {
     struct MyNode *next;
     void *value;
@@ -44,5 +44,3 @@ void hashmapU32_insert(Hashmap *table, uint32_t key, void *value);
 void *hashmapU32_remove(Hashmap *table, uint32_t key);
 
 void *hashmapU32_get(const Hashmap *table, uint32_t key);
-
-void hashmapU32_destroy(Hashmap *table);

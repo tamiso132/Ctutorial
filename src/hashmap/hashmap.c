@@ -21,6 +21,8 @@ static uint8_t tamiso_log2(uint32_t v)
     return log2table[(uint32_t)(v * 0x07C4ACDDU) >> 27];
 }
 
+static void hashmap_resize(Hashmap *table);
+
 static void SetU64_resize(SetU64 *table);
 void SetU64_init(SetU64 *table)
 {
@@ -163,9 +165,10 @@ void *hashmapU32_remove(Hashmap *table, uint32_t key)
         if (curr->key == key)
         {
             table->current_size--;
+            void *temp = curr->value;
             free(curr);
             table->array[index] = NULL;
-            return;
+            return temp;
         }
         curr = curr->next;
         MyNode *prev = curr;
@@ -185,13 +188,13 @@ void *hashmapU32_remove(Hashmap *table, uint32_t key)
             curr = curr->next;
         }
     }
+    return NULL;
 }
 
 void *hashmapU32_get(const Hashmap *table, uint32_t key)
 {
     uint32_t index = (uint64_t)(XXH64((void *)&key, sizeof(uint32_t), 0) & ((uint64_t)table->max_size - 1));
     MyNode *node = table->array[index];
-    int counter;
     while (node != NULL)
     {
         if (node->key == key)
@@ -201,7 +204,7 @@ void *hashmapU32_get(const Hashmap *table, uint32_t key)
         node = node->next;
     }
 
-    return 0;
+    return NULL;
 }
 
 static void hashmap_resize(Hashmap *table)

@@ -10,5 +10,4 @@ typedef struct Record
 
 void archetype_add(Vector *vector, Archetype *archtype);
 
-
-void hashmap_component_add(Hashmap)
+void hashmap_component_add(Hashmap);

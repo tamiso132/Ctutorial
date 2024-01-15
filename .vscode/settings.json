@@ -27,6 +27,7 @@
         "cstdint": "c",
         "macro.h": "c",
         "typeinfo": "c",
-        "unordered_map": "c"
+        "unordered_map": "c",
+        "datastructure.h": "c"
     }
 }
