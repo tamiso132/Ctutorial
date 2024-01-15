@@ -1,0 +1,10 @@
+/home/tom/xxHash/build/CMakeFiles/xxhash.dir
+/home/tom/xxHash/build/CMakeFiles/xxhsum.dir
+/home/tom/xxHash/build/CMakeFiles/package.dir
+/home/tom/xxHash/build/CMakeFiles/package_source.dir
+/home/tom/xxHash/build/CMakeFiles/edit_cache.dir
+/home/tom/xxHash/build/CMakeFiles/rebuild_cache.dir
+/home/tom/xxHash/build/CMakeFiles/list_install_components.dir
+/home/tom/xxHash/build/CMakeFiles/install.dir
+/home/tom/xxHash/build/CMakeFiles/install/local.dir
+/home/tom/xxHash/build/CMakeFiles/install/strip.dir

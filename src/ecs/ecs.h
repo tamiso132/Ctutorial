@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "xxhash.h"
 #include "../hashmap/hashmap.h"
-
 #define MAX_SIZE 1000
 // works by having indexes that map to all
 // non zero values in the dense array
@@ -12,7 +11,6 @@ typedef struct Column
 {
     void *elements;
     size_t element_size;
-    size_t count;
 } Column;
 
 typedef struct EntityId
@@ -24,12 +22,16 @@ typedef struct ComponentId
 {
     uint64_t id;
 } ComponentId;
-
+/// @brief all enities with unique combination of components
 typedef struct Archetype
 {
-    HashmapU32 entity_map;
+    uint64_t archetype_id;
+    /// @brief entity id mapped to index in archtype
+   // HashmapU32 entity_map;
+    uint32_t max_size;
+    /// @brief every column has it own component data
     Column **columns;
-};
+} Archetype;
 
 struct SparseSet
 {
@@ -38,7 +40,7 @@ struct SparseSet
     int size;             // Number of elements in the set
 };
 
-EntityId entity_add();
+EntityId *entity_add();
 
 void entity_generate(EntityId *entity);
 uint32_t entity_get_generation(EntityId entity);

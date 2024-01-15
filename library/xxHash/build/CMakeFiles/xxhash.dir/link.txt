@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC -O3 -DNDEBUG -shared -Wl,-soname,libxxhash.so.0 -o libxxhash.so.0.8.2 CMakeFiles/xxhash.dir/home/tom/xxHash/xxhash.c.o 

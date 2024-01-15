@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.5)
 
 # building xxHash library
 # TODO, try to extract it out of here
-set(CMAKE_PREFIX_PATH "/home/tom/Downloads/xxHash-dev/build/")
+set(CMAKE_PREFIX_PATH "library/xxHash/build")
 find_package(xxHash REQUIRED)
 
 

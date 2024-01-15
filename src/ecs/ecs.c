@@ -1,16 +1,24 @@
 #include <stdint.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include "xxhash.h"
 
+#include "../hashmap/macro.h"
+#include "datastructure.h"
 #include "ecs.h"
+
 
 uint16_t current_index;
 
-// component id / archtypeset
-static HashmapSet component_index;
+// mapped to archetype index
+static Vector all_archetypes;
 
-EntityId entity_add()
+
+
+EntityId *entity_add()
 {
-    EntityId id;
-    id.id = current_index;
+    EntityId *id = malloc(sizeof(EntityId));
+    id->id = current_index;
     current_index += 1;
 
     return id;

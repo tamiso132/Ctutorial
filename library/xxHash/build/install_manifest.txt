@@ -1,0 +1,12 @@
+/usr/local/lib/libxxhash.so.0.8.2
+/usr/local/lib/libxxhash.so.0
+/usr/local/lib/libxxhash.so
+/usr/local/include/xxhash.h
+/usr/local/include/xxh3.h
+/usr/local/bin/xxhsum
+/usr/local/share/man/man1/xxhsum.1
+/usr/local/lib/cmake/xxHash/xxHashConfig.cmake
+/usr/local/lib/cmake/xxHash/xxHashConfigVersion.cmake
+/usr/local/lib/cmake/xxHash/xxHashTargets.cmake
+/usr/local/lib/cmake/xxHash/xxHashTargets-release.cmake
+/usr/local/lib/pkgconfig/libxxhash.pc
