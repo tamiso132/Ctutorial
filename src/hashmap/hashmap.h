@@ -23,7 +23,7 @@ uint64_t *SetU64_get(const SetU64 *table, uint64_t key);
 
 typedef struct MyNodeU32 // TODO, HAVE TO VALUE AFTER MyNode
 {
-    struct MyNode *next;
+    struct MyNodeU32 *next;
     void *value;
     uint32_t key;
 
@@ -39,7 +39,7 @@ typedef struct HashmapU32
 
 typedef struct MyNodeU64 // TODO, HAVE TO VALUE AFTER MyNode
 {
-    struct MyNode *next;
+    struct MyNodeU64 *next;
     void *value;
     uint32_t key;
 

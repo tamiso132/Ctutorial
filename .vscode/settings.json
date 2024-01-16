@@ -28,6 +28,7 @@
         "macro.h": "c",
         "typeinfo": "c",
         "unordered_map": "c",
-        "datastructure.h": "c"
+        "datastructure.h": "c",
+        "ecs.h": "c"
     }
 }

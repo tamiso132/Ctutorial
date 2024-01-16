@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "xxhash.h"
+
+#include "../collection/vector.h"
 #include "../hashmap/hashmap.h"
 #define MAX_SIZE 1000
 // works by having indexes that map to all
@@ -27,10 +29,12 @@ typedef struct Archetype
 {
     uint64_t archetype_id;
     /// @brief entity id mapped to index in archtype
-   // HashmapU32 entity_map;
+    // HashmapU32 entity_map;
     uint32_t max_size;
     /// @brief every column has it own component data
-    Column **columns;
+    Vector columns;
+
+    Vector component_ids;
 } Archetype;
 
 struct SparseSet

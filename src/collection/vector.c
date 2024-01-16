@@ -43,8 +43,8 @@ void vector_push_element(Vector *vector, void *element)
 
         void *un_init_element = vector_get_unchecked(vector, vector->length);
         memcpy(un_init_element, element, vector->element_size);
-        vector->length++;
     }
+    vector->length++;
 }
 void vector_remove(Vector *vector, int index)
 {

@@ -1,13 +1,22 @@
 #include "ecs.h"
 #include "../hashmap/hashmap.h"
-#include "../collection/vector.h"
 
-typedef struct Record
+typedef struct Field
 {
     uint32_t archetype_id;
     uint32_t column_index;
+} Field;
+
+typedef struct Record
+{
+    uint32_t archtype_id;
+    uint32_t row;
 } Record;
 
-void archetype_add(Archetype *archtype);
+typedef struct ArchtypesField
+{
+    /// @brief Hashmap<ArchtypeId, column_id>
+    HashmapU32 archtypeid_field;
+} ArchtypesField;
 
-void hashmap_component_add(Hashmap);
+void *ecs_get_component(EntityId entity_id, ComponentId component);

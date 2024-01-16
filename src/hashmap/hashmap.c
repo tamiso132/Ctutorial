@@ -22,6 +22,7 @@ static uint8_t tamiso_log2(uint32_t v)
 }
 
 static void hashmapU32_resize(HashmapU32 *table);
+static void hashmapU64_resize(HashmapU64 *table);
 
 static void SetU64_resize(SetU64 *table);
 void SetU64_init(SetU64 *table)
@@ -158,7 +159,7 @@ void hashmapU32_insert(HashmapU32 *table, uint32_t key, void *value)
 
     if (table->load_max_size < table->current_size)
     {
-        hashmap_resize(table);
+        hashmapU32_resize(table);
     }
 }
 
@@ -175,7 +176,7 @@ void hashmapU64_insert(HashmapU64 *table, uint64_t key, void *value)
 
     if (table->load_max_size < table->current_size)
     {
-        hashmap_resize(table);
+        hashmapU64_resize(table);
     }
 }
 
@@ -317,7 +318,7 @@ static void hashmapU32_resize(HashmapU32 *table)
 static void hashmapU64_resize(HashmapU64 *table)
 {
     uint64_t new_pow_2 = tamiso_log2(table->max_size) + 1;
-    MyNodeU32 **array = calloc(1 << new_pow_2, sizeof(MyNodeU64));
+    MyNodeU64 **array = calloc(1 << new_pow_2, sizeof(MyNodeU64));
 
     for (uint32_t i = 0; i < table->max_size; i++)
     {

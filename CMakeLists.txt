@@ -36,7 +36,8 @@ set_target_properties(myexecutable PROPERTIES OUTPUT_NAME MyProjectC)
 set_target_properties(myexecutable PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # Add the test executable target
-add_executable(test_executable ${SOURCES} ${HEADERS} src/main_test.c)
+add_executable(test_executable ${SOURCES} ${HEADERS} test/main.c)
+target_include_directories(test_executable PRIVATE  ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 target_link_libraries(test_executable PRIVATE xxhash)
 
